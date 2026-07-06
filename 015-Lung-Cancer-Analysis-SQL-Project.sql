@@ -28,21 +28,15 @@ CREATE TABLE dataset_med
     PRIMARY KEY (id)
 );
 
-SET GLOBAL local_infile = 1;
-
-LOAD DATA LOCAL INFILE 'C:/Users/billy/Desktop/DataSets/data1/Excel Project/Lung Cancer Analysis/Dataset/dataset_med.csv'
-INTO TABLE  dataset_med
-FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES;
-
 -- BASIC DEMOGRAPHICS
 -- 1. What is the average age of patients in the dataset?
+
 SELECT
 	AVG(age) AS avg_age
 FROM dataset_med; 
 
 -- 2. What is the gender distribution of patients?
+
 SELECT
 	gender,
     COUNT(*) AS total_count
@@ -50,6 +44,7 @@ FROM dataset_med
 GROUP BY gender;
 
 -- 3. Which countries have the highest number of recorded cases?
+
 SELECT
 	country,
     COUNT(*) AS total_count
@@ -59,6 +54,7 @@ ORDER BY total_count DESC
 LIMIT 1;
 
 -- 4. What is the distribution of cancer stages at diagnosis?
+
 SELECT
 	cancer_stage,
     COUNT(*) AS total_count
@@ -68,12 +64,14 @@ ORDER BY cancer_stage;
 
 -- HEALTH AND RISK FACTOR
 -- 5. How many patients have a family history of cancer?
+
 SELECT
     COUNT(*) AS total_count
 FROM dataset_med
 WHERE family_history LIKE '%Yes%';
 
 -- 6. What is the average BMI of patients by cancer stage?
+
 SELECT
 	cancer_stage,
     AVG(bmi) AS avg_bmi
@@ -82,6 +80,7 @@ GROUP BY cancer_stage
 ORDER BY cancer_stage;
 
 -- 7. How does smoking status relate to cancer stage at diagnosis?
+
 SELECT
 	cancer_stage,
     smoking_status,
@@ -95,6 +94,7 @@ ORDER BY
     smoking_status;
     
 -- 8. How many patients have other chronic conditions (hypertension, asthma, cirrhosis, etc.)?
+
 SELECT
     COUNT(*) AS total_patientsOtherCondition
 FROM dataset_med
@@ -104,6 +104,7 @@ WHERE hypertension = 1
    OR other_cancer = 1;
 
 -- 9. Is there a correlation between cholesterol levels and survival rates? 
+
 SELECT
     CASE 
         WHEN cholesterol_level < 200 THEN 'Normal (<200)'
@@ -121,6 +122,7 @@ ORDER BY cholesterol_category;
 
 -- TREATMENT & OUTCOMES
 -- 10 What is the most common treatment type for each cancer stage?
+
 SELECT
 	cancer_stage,
     treatment_type,
@@ -134,11 +136,13 @@ ORDER BY
     treatment_type;
     
 -- 11. What is the average duration of treatment (diagnosis date → end treatment date)?
+
 SELECT
 	ROUND(AVG(end_treatment_date - diagnosis_date),2) AS avg_treatmentdays
 FROM dataset_med;
 
 -- 12. What percentage of patients survived by treatment type?
+
 SELECT
 	treatment_type,
     COUNT(*) AS total_patients,
@@ -151,6 +155,7 @@ GROUP BY treatment_type
 ORDER BY treatment_type;
 
 -- 13. Which country has the highest survival rate?
+
 SELECT
 	country,
     COUNT(*) AS total_patients,
@@ -164,6 +169,7 @@ ORDER BY survival_ratePercentage DESC
 LIMIT 1;
 
 -- 14. What is the survival rate for patients with family history vs. without?
+
 SELECT
 	family_history,
         COUNT(*) AS total_patients,
@@ -177,6 +183,7 @@ ORDER BY family_history;
 
 -- TIME BASED ANALYSIS
 -- 15. Which year had the highest number of diagnosis?
+
 SELECT
 	YEAR(diagnosis_date) AS year_diagnosis,
     COUNT(*) AS total_count
@@ -186,6 +193,7 @@ ORDER BY total_count DESC
 LIMIT 1;
 
 -- 16. How does survival rate vary based on year of diagnosis?
+
 SELECT
 	YEAR(end_treatment_date) AS end_treatmentYear,
 	COUNT(*) AS total_count
@@ -195,6 +203,7 @@ ORDER BY total_count DESC
 LIMIT 1;
 
 -- 17. What is the median survival time for different cancer stages?
+
 WITH survival_times AS (
     SELECT
         cancer_stage,
@@ -224,6 +233,7 @@ ORDER BY cancer_stage;
 
 -- COMPARATIVE AND PATTERN ANALYSIS
 -- 18. Is there a difference in average BMI between survivors and non-survivors?
+
 SELECT
     survived,
     ROUND(AVG(bmi), 2) AS avg_bmi,
@@ -233,6 +243,7 @@ GROUP BY survived
 ORDER BY survived DESC;
 
 -- 19. Do smokers have lower survival rates compared to non-smokers?
+
 SELECT
 	smoking_status,
 	SUM(CASE 
@@ -244,6 +255,7 @@ GROUP BY smoking_status
 ORDER BY survival_ratePercentage DESC;
 
 -- 20. Which combination of chronic diseases is most common among survivors?
+
 SELECT
     SUM(CASE WHEN hypertension = 1 THEN 1 END) AS total_hypertension,
     SUM(CASE WHEN asthma = 1 THEN 1 END) AS total_asthma,
@@ -256,6 +268,7 @@ ORDER BY total_survived DESC
 LIMIT 1;
 
 -- 21. Are younger patients diagnosed at earlier cancer stages more often than older ones?
+
 SELECT
     CASE 
         WHEN age < 40 THEN 'Under 40'
@@ -274,6 +287,7 @@ ORDER BY
     patient_count DESC;
 
 -- 22. Which cancer stage has the longest average treatment duration?
+
 SELECT
 	cancer_stage,
     ROUND(AVG(end_treatment_date - diagnosis_date),2) AS avg_days 
